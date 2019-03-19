@@ -1,7 +1,11 @@
 import pygame
-from carRacer import Car
 pygame.init()
 
+#basic window creation - width and height for dynamic reference
+display_width =1000
+display_height = 800
+
+#rgb color codes
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 GREEN = (0,255,0)
@@ -9,47 +13,36 @@ RED = (255,0,0)
 GREY = (119,136,153)
 PURPLE = (255,0,255)
 
-size = (400,500)
-screen=pygame.display.set_mode(size)
-pygame.display.set_caption("Car Racer")
+gameDisplay = pygame.display.set_mode((display_width,display_height)) #setting height and width of game window
+pygame.display.set_caption("Car Racing") #title of game window
 
-all_sprites_list = pygame.sprite.Group()
+carImg = pygame.image.load("Images/carPic.png")
 
-playerCar = Car(RED,200,300)
-playerCar.rect.x = 200
-playerCar.rect.y = 300
+def car(x,y):
+    gameDisplay.blit(carImg, (x,y)) #draws the car(in this case, the image) at (x,y) position
 
-all_sprites_list.add(playerCar)
 
-carryOn = True
-clock = pygame.time.Clock()
+#setting the starting position of car
+x = 300
+y = 400
+ 
+clock = pygame.time.Clock() #timing for game
 
-while carryOn:
+#the game is about not crashing into another object- so a crash variable is used to end the game
+isCrashed = False
+
+#game loop
+while not isCrashed:
+    #creating a list of events(in this case, key presses) that may happen
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            carryOn = False
-        elif event.type==pygame.KEYDOWN:
-            if event.key==pygame.K_x:
-                carryOn=False
+        if event.type == pygame.QUIT:#in this event, the user decides to quit the game
+            isCrashed = True
+    
+    gameDisplay.fill(WHITE)#change background color
+    car(x,y)
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        playerCar.moveRight(5)
-    if keys[pygame.K_DOWN]:
-        playerCar.moveLeft(5)
+    pygame.display.update() #can update specific parameters, or entire display(no parameters)
+    clock.tick(60) #frames per second
 
-    #Drawing on Screen
-    screen.fill(GREEN)
-    #Draw The Road
-    pygame.draw.rect(screen, GREY, [40,0, 200,500])
-    #Draw Line painting on the road
-    pygame.draw.line(screen, WHITE, [140,0],[140,500],5)
-
-
-    pygame.display.flip()
-    clock.tick(60)
-
-
-
-#Once we have exited the main program loop we can stop the game engine:
 pygame.quit()
+quit

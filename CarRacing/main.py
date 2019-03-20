@@ -16,15 +16,17 @@ PURPLE = (255,0,255)
 gameDisplay = pygame.display.set_mode((display_width,display_height)) #setting height and width of game window
 pygame.display.set_caption("Car Racing") #title of game window
 
-carImg = pygame.image.load("Images/carPic.png")
+carImg = pygame.image.load("Images/car.png")
 
 def car(x,y):
     gameDisplay.blit(carImg, (x,y)) #draws the car(in this case, the image) at (x,y) position
 
 
 #setting the starting position of car
-x = 300
-y = 400
+x = 0.45 * display_width
+y = 0.8 * display_height 
+
+x_change = 0 #change in x direction(when key is pressed)
  
 clock = pygame.time.Clock() #timing for game
 
@@ -37,6 +39,21 @@ while not isCrashed:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:#in this event, the user decides to quit the game
             isCrashed = True
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                x_change = -5
+            if event.key == pygame.K_RIGHT:
+                x_change = 5
+            
+        #when key is released, there must be no change in position
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or pygame.K_RIGHT:
+                x_change = 0
+    
+    x+=x_change
+
+
     
     gameDisplay.fill(WHITE)#change background color
     car(x,y)

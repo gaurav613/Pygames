@@ -1,5 +1,5 @@
 import pygame
-import time 
+import time, random
 pygame.init()
 
 #basic window creation - width and height for dynamic reference
@@ -18,8 +18,13 @@ gameDisplay = pygame.display.set_mode((display_width,display_height)) #setting h
 pygame.display.set_caption("Car Racing") #title of game window
 
 carImg = pygame.image.load("Images/car.png")
+taxiImg = pygame.image.load("Images/frontal-taxi-cab.png")
 
 clock = pygame.time.Clock() #timing for game
+
+def things(x,y,w,h,color):#method to draw a block which will act as an obstacle
+    #pygame.draw.rect(gameDisplay,color,[x,y,w,h])
+    gameDisplay.blit(taxiImg,(x,y))
 
 def car(x,y):
     gameDisplay.blit(carImg, (x,y)) #draws the car(in this case, the image) at (x,y) position
@@ -29,7 +34,7 @@ def text_objects(text, font):
     return textSurface, textSurface.get_rect()
 
 def message_display(message):#display a message in the center of the screen
-    largeText = pygame.font.Font('freesansbold.ttf',115)
+    largeText = pygame.font.Font('freesansbold.ttf',30)
     TextSurf, TextRect = text_objects(message, largeText)
     TextRect.center = ((display_width/2),(display_height/2))
     gameDisplay.blit(TextSurf, TextRect)
@@ -48,6 +53,12 @@ def game_loop():
     y = 0.8 * display_height 
 
     x_change = 0 #change in x direction(when key is pressed)
+
+    thing_startx = random.randrange(0,display_width)
+    thing_starty =  -600
+    thing_speed = 7
+    thing_width = 100
+    thing_height = 100
     
     #the game is about not crashing into another object- so a crash variable is used to end the game
     isCrashed = False
@@ -74,10 +85,21 @@ def game_loop():
         x+=x_change
 
         gameDisplay.fill(WHITE)#change background color
+
+        things(thing_startx, thing_starty, thing_width, thing_height, BLACK)
+        thing_starty += thing_speed
         car(x,y)
 
         if x > (display_width - car_width) or x < 0:
             crash()
+
+        if thing_starty > display_height : #block goes off the screen, reset
+            thing_starty = 0 - thing_height
+            thing_startx = random.randrange(0,display_width)
+
+        if (y+22 < thing_starty + thing_height) and (y+22>thing_starty):
+            if( (thing_startx + thing_width) > x > (thing_startx - car_width) ):
+                crash()
 
         pygame.display.update() #can update specific parameters, or entire display(no parameters)
         clock.tick(60) #frames per second

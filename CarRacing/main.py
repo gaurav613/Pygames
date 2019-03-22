@@ -22,18 +22,20 @@ taxiImg = pygame.image.load("Images/frontal-taxi-cab.png")
 
 clock = pygame.time.Clock() #timing for game
 
-def things(x,y,w,h,color):#method to draw a block which will act as an obstacle
-    #pygame.draw.rect(gameDisplay,color,[x,y,w,h])
+#method to draw a block which will act as an obstacle
+def things(x,y,w,h):
     gameDisplay.blit(taxiImg,(x,y))
 
+#draws the car(in this case, the image) at (x,y) position
 def car(x,y):
-    gameDisplay.blit(carImg, (x,y)) #draws the car(in this case, the image) at (x,y) position
+    gameDisplay.blit(carImg, (x,y)) 
 
 def text_objects(text, font):
     textSurface = font.render(text, True, RED)
     return textSurface, textSurface.get_rect()
 
-def message_display(message):#display a message in the center of the screen
+#display a message in the center of the screen
+def message_display(message):
     largeText = pygame.font.Font('freesansbold.ttf',30)
     TextSurf, TextRect = text_objects(message, largeText)
     TextRect.center = ((display_width/2),(display_height/2))
@@ -46,6 +48,12 @@ def message_display(message):#display a message in the center of the screen
 def crash():
     message_display('YoU cRaShEd! GaMe OvEr')
 
+#scoring- increment the score once the obstacle is avoided, and display on the top right
+def add_score(score):
+    font = pygame.font.SysFont(None,25)
+    text =  font.render("Score: "+ str(score), True, BLACK)
+    gameDisplay.blit(text,(0,0))
+
 #game loop
 def game_loop():
     #setting the starting position of car
@@ -56,9 +64,12 @@ def game_loop():
 
     thing_startx = random.randrange(0,display_width)
     thing_starty =  -600
-    thing_speed = 7
+    thing_speed = 5
     thing_width = 100
     thing_height = 100
+    thing_repeat = [random.randrange(0,display_width-thing_width)]
+    thing_count = 1
+    score = 0 #starting score is zero
     
     #the game is about not crashing into another object- so a crash variable is used to end the game
     isCrashed = False
@@ -86,16 +97,24 @@ def game_loop():
 
         gameDisplay.fill(WHITE)#change background color
 
-        things(thing_startx, thing_starty, thing_width, thing_height, BLACK)
+        things(thing_startx , thing_starty, thing_width, thing_height)
+
         thing_starty += thing_speed
         car(x,y)
+        #important to print score last, so that there's no overlapping
+        add_score(score)
 
+        #crash if the car hits the window boundary
         if x > (display_width - car_width) or x < 0:
             crash()
 
-        if thing_starty > display_height : #block goes off the screen, reset
+        #block goes off the screen, reset. Also means that the car avoided the obstacle, increasing the score
+        if thing_starty > display_height : 
             thing_starty = 0 - thing_height
-            thing_startx = random.randrange(0,display_width)
+            thing_startx = random.randrange(0, (display_width-thing_width))
+            score += 1
+            if(score%5== 0):
+                thing_speed += 2
 
         if (y+22 < thing_starty + thing_height) and (y+22>thing_starty):
             if( (thing_startx + thing_width) > x > (thing_startx - car_width) ):

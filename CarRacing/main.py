@@ -9,11 +9,17 @@ display_height = 600
 #rgb color codes
 BLACK = (0,0,0)
 WHITE = (255,255,255)
-GREEN = (0,255,0)
-RED = (255,0,0)
+GREEN = (0,200,0)
+RED = (200,0,0)
+LIGHT_RED = (255,0,0)
+LIGHT_GREEN = (0,255,0)
 GREY = (119,136,153)
 PURPLE = (255,0,255)
 
+#text sizes
+smallText = pygame.font.Font('freesansbold.ttf', 20)
+mediumText = pygame.font.Font('freesansbold.ttf', 30)
+largeText = pygame.font.Font('freesansbold.ttf',60)
 gameDisplay = pygame.display.set_mode((display_width,display_height)) #setting height and width of game window
 pygame.display.set_caption("Car Racing") #title of game window
 
@@ -31,7 +37,7 @@ def car(x,y):
     gameDisplay.blit(carImg, (x,y)) 
 
 def text_objects(text, font):
-    textSurface = font.render(text, True, RED)
+    textSurface = font.render(text, True, BLACK)
     return textSurface, textSurface.get_rect()
 
 #display a message in the center of the screen
@@ -48,11 +54,57 @@ def message_display(message):
 def crash():
     message_display('YoU cRaShEd! GaMe OvEr')
 
+#method to display button with clicking
+def button(message, x, y, w, h, inactive, active, action = "None"):
+    mouse = pygame.mouse.get_pos()
+    clicked = pygame.mouse.get_pressed()
+
+    #highlight button when hovered over
+    if (x+w > mouse[0] > x and y+h > mouse[1] > y):
+        pygame.draw.rect(gameDisplay,active,(x,y,w,h))
+
+        if clicked[0] == 1 and action!="None":#left click
+            if action == "play":
+                game_loop()
+            elif action == "quit":
+                pygame.quit()
+                quit()
+
+
+    else:
+        pygame.draw.rect(gameDisplay,inactive,(x,y,w,h))
+
+    #add text over button    
+    TextSurf, TextRect = text_objects(message, smallText)
+    TextRect.center = ( (x + (w/2)), (y+(h/2)) )
+    gameDisplay.blit(TextSurf, TextRect)
+
 #scoring- increment the score once the obstacle is avoided, and display on the top right
 def add_score(score):
     font = pygame.font.SysFont(None,25)
     text =  font.render("Score: "+ str(score), True, BLACK)
     gameDisplay.blit(text,(0,0))
+
+#load a start screen
+def game_intro():
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                quit()
+        gameDisplay.fill(WHITE)
+
+        
+        TextSurf, TextRect = text_objects("Dodger", largeText)
+        TextRect.center = ((display_width/2),(display_height/2))
+        gameDisplay.blit(TextSurf, TextRect)
+
+        button("START",200,450,100,50,GREEN,LIGHT_GREEN,"play")
+        button("QUIT",500,450,100,50,RED,LIGHT_RED,"quit")
+        pygame.display.update()
+        clock.tick(15)
 
 #game loop
 def game_loop():
@@ -122,7 +174,7 @@ def game_loop():
 
         pygame.display.update() #can update specific parameters, or entire display(no parameters)
         clock.tick(60) #frames per second
-
+game_intro()
 game_loop()
 pygame.quit()
 quit

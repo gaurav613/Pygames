@@ -27,6 +27,7 @@ carImg = pygame.image.load("Images/car.png")
 taxiImg = pygame.image.load("Images/frontal-taxi-cab.png")
 
 clock = pygame.time.Clock() #timing for game
+pause = True
 
 #method to draw a block which will act as an obstacle
 def things(x,y,w,h):
@@ -50,9 +51,22 @@ def message_display(message):
     time.sleep(2)
     game_loop()
 
-
+#display message and buttons to start over/quit
 def crash():
-    message_display('YoU cRaShEd! GaMe OvEr')
+    TextSurf, TextRect = text_objects("GAME OVER!", largeText)
+    TextRect.center = ((display_width/2),(display_height/2))
+    gameDisplay.blit(TextSurf, TextRect)
+    while True:
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                quit()
+
+    
+        button("PLAY AGAIN",200,450,120,50,GREEN,LIGHT_GREEN,"play")
+        button("QUIT",500,450,100,50,RED,LIGHT_RED,"quit")
+        pygame.display.update()
+        clock.tick(15)
 
 #method to display button with clicking
 def button(message, x, y, w, h, inactive, active, action = "None"):
@@ -69,6 +83,8 @@ def button(message, x, y, w, h, inactive, active, action = "None"):
             elif action == "quit":
                 pygame.quit()
                 quit()
+            elif action=="unpause":
+                CONTINUE()
 
 
     else:
@@ -85,10 +101,33 @@ def add_score(score):
     text =  font.render("Score: "+ str(score), True, BLACK)
     gameDisplay.blit(text,(0,0))
 
+#changing pause to false when continue
+def CONTINUE():
+    global pause
+    pause = False
+    
+#pause screen 
+def isPaused():
+    
+    TextSurf, TextRect = text_objects("PAUSED", largeText)
+    TextRect.center = ((display_width/2),(display_height/2))
+    gameDisplay.blit(TextSurf, TextRect)
+    while pause:
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        button("CONTINUE",200,450,120,50,GREEN,LIGHT_GREEN,"unpause")
+        button("QUIT",500,450,100,50,RED,LIGHT_RED,"quit")
+        pygame.display.update()
+        clock.tick(15)
+
+
 #load a start screen
 def game_intro():
     intro = True
-
+    
     while intro:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -123,6 +162,8 @@ def game_loop():
     thing_count = 1
     score = 0 #starting score is zero
     
+    global pause
+
     #the game is about not crashing into another object- so a crash variable is used to end the game
     isCrashed = False
     gameExit = False
@@ -139,6 +180,9 @@ def game_loop():
                     x_change = -5
                 if event.key == pygame.K_RIGHT:
                     x_change = 5
+                if event.key == pygame.K_p:
+                    pause = True
+                    isPaused()
                 
             #when key is released, there must be no change in position
             if event.type == pygame.KEYUP:
